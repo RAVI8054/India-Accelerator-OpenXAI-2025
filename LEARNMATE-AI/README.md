@@ -1,108 +1,127 @@
-# 📚 LearnAI Template
+# Movie Search with LangChain + Ollama
 
-A Next.js template for building educational AI applications! This template provides three powerful learning tools: Flashcard Maker, Quiz Generator, and Ask-Me Study Buddy.
+This project provides a **movie search assistant** using [LangChain](https://js.langchain.com) with a local [Ollama](https://ollama.com) LLM and custom API tools for filtering movies by **title**, **genre**, **year**, and **rating**.
 
-## Features
+---
 
-### 🃏 Flashcard Maker
-- **Smart Flashcards**: Paste your notes and AI creates interactive flashcards
-- **Review Mode**: Flip cards to test your knowledge
-- **Bulk Creation**: Generate multiple flashcards from large text blocks
+## 🚀 Features
 
-### 📝 Quiz Maker  
-- **Auto Quiz Generation**: Paste text and get a complete quiz
-- **Multiple Choice**: AI generates questions with multiple choice answers
-- **Instant Feedback**: Get immediate results and explanations
+* Natural language movie queries.
+* Automatic tool routing with LangChain.
+* Support for multiple filters at once (e.g., *“Find action movies from 1999 with rating 8+”*).
+* Genre inference with support for combined/colloquial tags (e.g., *rom-com*, *action-thriller*, *sci-fi*).
+* Intersects results from multiple tool calls to give precise matches.
 
-### 🤖 Ask-Me Study Buddy
-- **AI Study Partner**: Ask any question and get helpful explanations
-- **Interactive Learning**: Follow-up questions and clarifications
-- **Subject Agnostic**: Works for any topic or subject
+---
 
-## 🚀 Getting Started
+## 📦 Installation
 
-### Installation
+1. Clone the repo:
 
-1. Navigate to the nextjs-app directory:
-```bash
-cd nextjs-app
-```
+   ```bash
+   git clone <your-repo-url>
+   cd your-repo
+   ```
 
 2. Install dependencies:
-```bash
-npm install
+
+   ```bash
+   npm install
+   ```
+
+3. Install [Ollama](https://ollama.com) and pull the required model (default: `llama3.2:1b`):
+
+   ```bash
+   ollama pull llama3.2:1b
+   ```
+
+4. Start Ollama server (usually runs at `http://localhost:11434`):
+
+   ```bash
+   ollama serve
+   ```
+
+5. Configure environment variables:
+
+   ```env
+   NEXT_PUBLIC_BASE_URL=http://localhost:3000   # or your API base URL
+   ```
+
+---
+
+## 🛠️ Usage
+
+Import and call the main function with a query:
+
+```js
+import { callmassag } from "./ollama-movie-tools-fixed.js";
+
+const response = await callmassag("Find comedy movies from 2010 with rating above 7");
+console.log(response);
 ```
 
-3. Run the development server:
-```bash
-npm run dev
+Example output:
+
+```json
+[
+  { "message": "Movies matching genre = Comedy, year = 2010, rating ≥ 7:" },
+  {
+    "title": "Easy A",
+    "description": "A comedy about...",
+    "year": 2010,
+    "genre": "Comedy",
+    "rating": 7.5
+  },
+  ...
+]
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-## 📁 Project Structure
+## 📚 API Endpoints
 
-```
-nextjs-app/
-├── app/
-│   ├── api/
-│   │   ├── flashcards/
-│   │   │   └── route.ts          # Flashcard generation endpoint
-│   │   ├── quiz/
-│   │   │   └── route.ts          # Quiz generation endpoint
-│   │   └── study-buddy/
-│   │       └── route.ts          # Study buddy chat endpoint
-│   ├── globals.css               # Global styles
-│   ├── layout.tsx                # Root layout component
-│   └── page.tsx                  # Main interface with all features
-├── package.json                  # Dependencies and scripts
-└── tsconfig.json                 # TypeScript configuration
-```
+The tools expect your backend to provide these endpoints (returning JSON arrays of movies):
 
-## 🎯 How to Use
+* `GET /api/title/:title`
+* `GET /api/genre/:genre`
+* `GET /api/year/:year`
+* `GET /api/rating/:rating`
 
-### Flashcard Maker
-1. Click on the "Flashcard Maker" tab
-2. Paste your study notes in the text area
-3. Click "Generate Flashcards" 
-4. Review and flip through your generated flashcards
+Each movie object should follow this shape:
 
-### Quiz Maker
-1. Select the "Quiz Maker" tab
-2. Paste the text you want to be quizzed on
-3. Click "Create Quiz"
-4. Answer the multiple choice questions and get instant feedback
-
-### Study Buddy
-1. Go to the "Study Buddy" tab
-2. Type any question you have about your subject
-3. Get detailed explanations and ask follow-up questions
-
-## 🤖 AI Model
-
-This template uses Ollama with the `llama3.2:1b` model for all AI operations. Make sure you have Ollama installed and the model downloaded:
-
-```bash
-ollama pull llama3.2:1b
+```json
+{
+  "title": "string",
+  "description": "string",
+  "year": 2020,
+  "genre": "Action",
+  "rating": 8.5
+}
 ```
 
-## 🎨 Customization
+---
 
-- Modify the UI in `app/page.tsx`
-- Adjust AI prompts in the API routes
-- Customize styling in `app/globals.css`
-- Add more features by creating new API endpoints
+## 🧩 How It Works
 
-## 🛠 Dependencies
+1. User input is sent to the Ollama LLM.
+2. System prompt instructs the LLM to:
 
-- **Next.js 14**: React framework
-- **TypeScript**: Type safety
-- **Tailwind CSS**: Styling
-- **Ollama**: Local AI model integration
+   * Parse genres, years, titles, ratings.
+   * Call one or more tools accordingly.
+3. Each tool fetches from the API.
+4. Results from multiple tools are **intersected** to ensure all filters are applied.
+5. Final results are formatted and returned.
 
-## 📖 Educational Use Cases
+---
 
-- **Students**: Create study materials from lecture notes
-- **Teachers**: Generate quizzes and learning aids
-- **Self-learners**: Get AI tutoring on any topic
-- **Exam Prep**: Practice with generated questions and flashcards 
+## 🔧 Development Notes
+
+* Extend `genreSchema` if you want to support more custom genre tags.
+* Add new tools easily by following the same `tool(...)` pattern.
+* The `intersectResults` helper ensures multi-filter precision.
+
+---
+
+## 📜 License
+
+MIT License

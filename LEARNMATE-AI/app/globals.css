@@ -1,0 +1,43 @@
+/* Tailwind CSS Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset / Base Styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+
+  /* background-color: #f8fafc;  */
+  /* Light background */
+background-color: gray;
+
+  color: #111827; /* Neutral text */
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+/* Smooth scrolling for all elements */
+* {
+  box-sizing: border-box;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #9ca3af; /* Gray */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280; /* Darker gray */
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
